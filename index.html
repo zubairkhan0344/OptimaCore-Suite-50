@@ -5,40 +5,48 @@
       // Prevent "Cannot set property fetch of #<Window> which has only a getter" error inside wrapped sandbox environments
       (function() {
         try {
-          const nativeFetch = window.fetch || globalThis.fetch;
-          if (nativeFetch) {
-            Object.defineProperty(window, 'fetch', {
-              value: nativeFetch,
-              writable: true,
+          const originalFetch = window.fetch || globalThis.fetch;
+          let customFetch = undefined;
+
+          const getFetch = function() {
+            return customFetch || originalFetch;
+          };
+          const setFetch = function(v) {
+            customFetch = v;
+          };
+
+          // 1. Redefine on Window.prototype if possible (where native fetch often resides)
+          try {
+            Object.defineProperty(Window.prototype, 'fetch', {
+              get: getFetch,
+              set: setFetch,
               configurable: true,
               enumerable: true
             });
-            if (typeof globalThis !== 'undefined' && globalThis !== window) {
+          } catch (e) {}
+
+          // 2. Redefine on window directly to intercept window.fetch assignments
+          try {
+            Object.defineProperty(window, 'fetch', {
+              get: getFetch,
+              set: setFetch,
+              configurable: true,
+              enumerable: true
+            });
+          } catch (e) {}
+
+          // 3. Redefine on globalThis directly to intercept globalThis.fetch assignments
+          if (typeof globalThis !== 'undefined' && globalThis !== window) {
+            try {
               Object.defineProperty(globalThis, 'fetch', {
-                value: nativeFetch,
-                writable: true,
+                get: getFetch,
+                set: setFetch,
                 configurable: true,
                 enumerable: true
               });
-            }
+            } catch (e) {}
           }
-        } catch (e) {
-          try {
-            let activeFetch = window.fetch || globalThis.fetch;
-            const descriptor = {
-              get() { return activeFetch; },
-              set(v) { activeFetch = v; },
-              configurable: true,
-              enumerable: true
-            };
-            Object.defineProperty(window, 'fetch', descriptor);
-            if (typeof globalThis !== 'undefined' && globalThis !== window) {
-              Object.defineProperty(globalThis, 'fetch', descriptor);
-            }
-          } catch (err) {
-            // Fallback silently if environment strictly blocks redefining
-          }
-        }
+        } catch (e) {}
       })();
     </script>
     <meta charset="UTF-8" />
