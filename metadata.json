@@ -1,0 +1,6 @@
+{
+  "name": "Interactive Calculator and Micro-Utility Hub",
+  "description": "A high-performance, responsive portal featuring 50 specialized calculators and micro-utilities for Finance, Compliance, Data Analysis, Privacy, and Real Estate. Optimized with structured JSON-LD schemas and conversational prompts for maximum search and AI chatbot discoverability.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

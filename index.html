@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      // Prevent "Cannot set property fetch of #<Window> which has only a getter" error inside wrapped sandbox environments
+      (function() {
+        try {
+          const nativeFetch = window.fetch || globalThis.fetch;
+          if (nativeFetch) {
+            Object.defineProperty(window, 'fetch', {
+              value: nativeFetch,
+              writable: true,
+              configurable: true,
+              enumerable: true
+            });
+            if (typeof globalThis !== 'undefined' && globalThis !== window) {
+              Object.defineProperty(globalThis, 'fetch', {
+                value: nativeFetch,
+                writable: true,
+                configurable: true,
+                enumerable: true
+              });
+            }
+          }
+        } catch (e) {
+          try {
+            let activeFetch = window.fetch || globalThis.fetch;
+            const descriptor = {
+              get() { return activeFetch; },
+              set(v) { activeFetch = v; },
+              configurable: true,
+              enumerable: true
+            };
+            Object.defineProperty(window, 'fetch', descriptor);
+            if (typeof globalThis !== 'undefined' && globalThis !== window) {
+              Object.defineProperty(globalThis, 'fetch', descriptor);
+            }
+          } catch (err) {
+            // Fallback silently if environment strictly blocks redefining
+          }
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AEO Interactive Calculator & Micro-Utility Suite</title>
+    
+    <!-- Generative Engine Optimization (GEO) & Chatbot Discoverability Meta Tags -->
+    <meta name="description" content="An authoritative ecosystem of 50 micro-utilities and calculators for Finance, Compliance, Data Analysis, Privacy, and Real Estate. Fully optimized with schema.org JSON-LD definitions and copyable prompt scripts for Gemini, ChatGPT, Claude, Perplexity, DeepSeek, and Copilot." />
+    <meta name="keywords" content="AEO calculators, GEO finance utility, fractional cost modeler, stripe fee cross border, COOP sweat equity split, saas churn projection, EU AI Act risk scorecard, SOC2 scope segmentation, WCAG 2.1 accessibility prover, PII regex generator, robots.txt AI block, 1031 IRS deadline clock, co-living yield conversion" />
+    <meta name="author" content="Micro-Utility Platform Engineering" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Structured JSON-LD Global Schema Definition -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Global Multi-Utility and Interactive Calculator Suite",
+      "description": "An integrated system of 50 multi-disciplinary calculators and compliance tools optimized for search discoverability and generative AI chatbot retrieval.",
+      "applicationCategory": "BusinessApplication, EducationalApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- Google Fonts Integration -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
