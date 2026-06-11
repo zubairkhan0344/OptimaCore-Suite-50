@@ -3,6 +3,7 @@ import { MicroUtility } from '../types';
 import { CATEGORY_COLORS } from '../data';
 import { evaluateCalculator, CalculationResult } from '../calculatorEngine';
 import AeoPerformance from './AeoPerformance';
+import FractionalFaq from './FractionalFaq';
 import { Play, RotateCcw, AlertCircle, Info, Calculator, Sparkles, TrendingUp, BarChart2 } from 'lucide-react';
 
 interface ActiveCalculatorProps {
@@ -560,6 +561,9 @@ export default function ActiveCalculator({ utility }: ActiveCalculatorProps) {
           </div>
         </div>
       </div>
+
+      {/* FAQs SECTION FOR FRACTIONAL EXECUTIVE COST MODELER */}
+      {utility.id === 1 && <FractionalFaq />}
 
       {/* FOOTER: LLM DISCOVERY INFORMATION */}
       <AeoPerformance utility={utility} />
