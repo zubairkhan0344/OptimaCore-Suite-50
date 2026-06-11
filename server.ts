@@ -190,7 +190,7 @@ async function startServer() {
     });
   }
 
-  // Render homepage dynamically, injecting dynamic JSON-LD structured data on-the-fly!
+  // Render homepage dynamically, injecting dynamic JSON-LD structured data and Google Analytics tags on-the-fly!
   app.get("/", async (req, res, next) => {
     try {
       const protocol = req.headers["x-forwarded-proto"] || req.protocol || "https";
@@ -204,15 +204,19 @@ async function startServer() {
       const schema = getStructuredDataForUtility(activeUtil.id, baseUrl);
       const schemaScript = `\n    <script type="application/ld+json" id="backend-schema-markup">\n      ${JSON.stringify(schema, null, 2)}\n    </script>\n`;
 
+      const gaId = process.env.GA_MEASUREMENT_ID || "G-40R9JFQN9G";
+
       if (process.env.NODE_ENV !== "production" && vite) {
         let html = fs.readFileSync(path.resolve(process.cwd(), "index.html"), "utf-8");
         html = await vite.transformIndexHtml(req.originalUrl, html);
+        html = html.replace(/G-40R9JFQN9G/g, gaId);
         html = html.replace("</head>", `${schemaScript}</head>`);
         res.status(200).set({ "Content-Type": "text/html" }).end(html);
       } else {
         const distIndexPath = path.join(process.cwd(), "dist", "index.html");
         if (fs.existsSync(distIndexPath)) {
           let html = fs.readFileSync(distIndexPath, "utf-8");
+          html = html.replace(/G-40R9JFQN9G/g, gaId);
           html = html.replace("</head>", `${schemaScript}</head>`);
           res.status(200).set({ "Content-Type": "text/html" }).end(html);
         } else {
@@ -231,7 +235,15 @@ async function startServer() {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      const distIndexPath = path.join(distPath, "index.html");
+      if (fs.existsSync(distIndexPath)) {
+        let html = fs.readFileSync(distIndexPath, "utf-8");
+        const gaId = process.env.GA_MEASUREMENT_ID || "G-40R9JFQN9G";
+        html = html.replace(/G-40R9JFQN9G/g, gaId);
+        res.status(200).set({ "Content-Type": "text/html" }).send(html);
+      } else {
+        res.status(404).send("Not Found");
+      }
     });
   }
 
