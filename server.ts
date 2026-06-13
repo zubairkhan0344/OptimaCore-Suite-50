@@ -209,6 +209,11 @@ async function startServer() {
       if (process.env.NODE_ENV !== "production" && vite) {
         let html = fs.readFileSync(path.resolve(process.cwd(), "index.html"), "utf-8");
         html = await vite.transformIndexHtml(req.originalUrl, html);
+        
+        const { render } = await vite.ssrLoadModule('/src/entry-server.tsx');
+        const appHtml = render(req.originalUrl);
+        html = html.replace(/<div id="root">.*?<\/div>/s, `<div id="root">${appHtml}</div>`);
+        
         html = html.replace(/G-40R9JFQN9G/g, gaId);
         html = html.replace("</head>", `${schemaScript}</head>`);
         res.status(200).set({ "Content-Type": "text/html" }).end(html);
@@ -216,6 +221,15 @@ async function startServer() {
         const distIndexPath = path.join(process.cwd(), "dist", "index.html");
         if (fs.existsSync(distIndexPath)) {
           let html = fs.readFileSync(distIndexPath, "utf-8");
+          
+          try {
+            const { render } = await import(path.resolve(process.cwd(), 'dist/server/entry-server.js'));
+            const appHtml = render(req.originalUrl);
+            html = html.replace(/<div id="root">.*?<\/div>/s, `<div id="root">${appHtml}</div>`);
+          } catch (err) {
+            console.error("SSR rendering error:", err);
+          }
+
           html = html.replace(/G-40R9JFQN9G/g, gaId);
           html = html.replace("</head>", `${schemaScript}</head>`);
           res.status(200).set({ "Content-Type": "text/html" }).end(html);
@@ -234,10 +248,19 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
+    app.get("*", async (req, res) => {
       const distIndexPath = path.join(distPath, "index.html");
       if (fs.existsSync(distIndexPath)) {
         let html = fs.readFileSync(distIndexPath, "utf-8");
+        
+        try {
+          const { render } = await import(path.resolve(process.cwd(), 'dist/server/entry-server.js'));
+          const appHtml = render(req.originalUrl);
+          html = html.replace(/<div id="root">.*?<\/div>/s, `<div id="root">${appHtml}</div>`);
+        } catch (err) {
+          console.error("SSR rendering error:", err);
+        }
+
         const gaId = process.env.GA_MEASUREMENT_ID || "G-40R9JFQN9G";
         html = html.replace(/G-40R9JFQN9G/g, gaId);
         res.status(200).set({ "Content-Type": "text/html" }).send(html);

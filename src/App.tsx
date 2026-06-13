@@ -147,7 +147,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] text-[#1a1a1a] flex flex-col font-sans">
+    <main className="min-h-screen bg-[#fcfcfc] text-[#1a1a1a] flex flex-col font-sans">
       {/* FLOATING CRAWLER DISCOVERABILITY BADGE */}
       <div className="bg-white text-gray-600 text-[10px] sm:text-xs font-semibold py-2.5 px-4 shadow-sm overflow-hidden text-center flex items-center justify-center gap-2 border-b border-gray-200 shrink-0">
         <Bot className="w-3.5 h-3.5 text-blue-600 animate-pulse shrink-0" />
@@ -163,9 +163,9 @@ export default function App() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-lg sm:text-xl font-black tracking-tight text-[#1a1a1a]">
-                  OptimaCore <span className="font-light text-gray-500">Suite 50</span>
-                </span>
+                <h1 className="text-lg sm:text-xl font-black tracking-tight text-[#1a1a1a] m-0 leading-none">
+                  OptimaCore: AEO Score Calculator
+                </h1>
                 <span className="text-[10px] font-bold bg-blue-50 border border-blue-200 text-blue-600 px-2 py-0.5 rounded-full uppercase tracking-wider font-mono">
                   v1.2.0
                 </span>
@@ -231,7 +231,7 @@ export default function App() {
             <div>
               <h2 className="text-base sm:text-lg font-black tracking-tight text-gray-950 flex items-center gap-2">
                 <Sliders className="w-4.5 h-4.5 text-blue-600" />
-                Explore Active Resource Utilities
+                AEO Interactive Calculator & Micro-Utility Suite
               </h2>
               <p className="text-xs text-gray-500 mt-0.5 font-medium">
                 Filter by department category or run a semantic keyword search to launch any specific tool instantly.
@@ -303,7 +303,7 @@ export default function App() {
       </section>
 
       {/* CHANNELS GRID SECTION */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:py-8">
+      <section className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:py-8">
         {filteredUtilities.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredUtilities.map((util) => {
@@ -370,7 +370,7 @@ export default function App() {
             </button>
           </div>
         )}
-      </main>
+      </section>
 
       {/* POPUP MODAL CONTAINER FOR THE RUNNING CALCULATOR */}
       <AnimatePresence>
@@ -534,6 +534,6 @@ export default function App() {
 
       {/* FOOTER DIALOG POPUPS */}
       <FooterModals activeModal={activeModal} onClose={() => setActiveModal(null)} />
-    </div>
+    </main>
   );
 }
