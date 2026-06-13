@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { UTILITIES, CATEGORY_COLORS, CATEGORY_LABELS } from '../data';
-import { UtilityCategory, MicroUtility } from '../types';
+import { UtilityCategory } from '../types';
 import { 
   Bot, 
   Sparkles, 
@@ -38,7 +37,7 @@ const CATEGORY_TABS: { value: UtilityCategory | 'all'; label: string; icon: any 
   { value: 'real_estate', label: 'Real Estate & Property', icon: HomeIcon }
 ];
 
-export default function Home() {
+export default function Home({ navigate }: { navigate: (path: string) => void }) {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<UtilityCategory | 'all'>('all');
 
@@ -190,8 +189,8 @@ export default function Home() {
               const slug = generateSlug(util.name);
 
               return (
-                <Link
-                  to={`/tools/${slug}`}
+                <div
+                  onClick={() => navigate(`/tools/${slug}`)}
                   key={util.id}
                   id={`card-${util.id}`}
                   className="group relative bg-white border border-gray-200/90 rounded-2xl p-5 hover:border-blue-600/60 hover:shadow-[0_12px_35px_rgba(0,0,0,0.035)] hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between h-[230px]"
@@ -223,7 +222,7 @@ export default function Home() {
                     <span className="font-semibold uppercase tracking-wider text-[9px]">Launch Model Engine</span>
                     <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

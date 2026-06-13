@@ -1,8 +1,7 @@
-import React, { useMemo } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
-import { UTILITIES, CATEGORY_COLORS, CATEGORY_LABELS } from '../data';
+import React, { useMemo, useEffect } from 'react';
+import { SLUG_DICTIONARY } from '../utils/slugDict';
+import { CATEGORY_COLORS, CATEGORY_LABELS } from '../data';
 import ActiveCalculator from '../components/ActiveCalculator';
-import { generateSlug } from '../utils/slug';
 import { ArrowLeft, BookmarkCheck, Sliders, Coins, Scale, BarChart3, Lock, Home as HomeIcon } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -13,15 +12,19 @@ const CATEGORY_ICONS: Record<string, any> = {
   real_estate: HomeIcon,
 };
 
-export default function ToolPage() {
-  const { slug } = useParams<{ slug: string }>();
-
+export default function ToolPage({ slug, navigate }: { slug: string, navigate: (path: string) => void }) {
   const activeUtility = useMemo(() => {
-    return UTILITIES.find(u => generateSlug(u.name) === slug);
+    return SLUG_DICTIONARY[slug];
   }, [slug]);
 
+  useEffect(() => {
+    if (!activeUtility) {
+      navigate('/');
+    }
+  }, [activeUtility, navigate]);
+
   if (!activeUtility) {
-    return <Navigate to="/" replace />;
+    return null;
   }
 
   const colors = CATEGORY_COLORS[activeUtility.category];
@@ -38,9 +41,12 @@ export default function ToolPage() {
       )}
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 py-8">
-          <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors mb-6">
+          <div 
+            onClick={() => navigate('/')} 
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors mb-6 cursor-pointer"
+          >
             <ArrowLeft className="w-4 h-4" /> Back to Utilities
-          </Link>
+          </div>
           
           <div className="flex items-center gap-3 min-w-0">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${colors.bg}`}>

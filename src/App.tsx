@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import FooterModals from './components/FooterModals';
 import Home from './pages/Home';
 import ToolPage from './pages/ToolPage';
+import { SLUG_DICTIONARY } from './utils/slugDict';
 import { 
   Bot, 
   Sparkles, 
@@ -16,8 +16,48 @@ import {
   BookmarkCheck,
 } from 'lucide-react';
 
-export default function App() {
+export default function App({ serverUrl }: { serverUrl?: string }) {
   const [activeModal, setActiveModal] = useState<'authors' | 'about' | 'contact' | 'privacy' | 'terms' | null>(null);
+
+  // Read window.location.pathname
+  const getInitialPath = () => {
+    if (serverUrl) return serverUrl;
+    if (typeof window !== 'undefined') {
+      return window.location.pathname;
+    }
+    return '/';
+  };
+
+  const [currentPath, setCurrentPath] = useState(getInitialPath());
+
+  // Listen for the popstate event for back/forward browser buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // HTML5 History API without hard page reload
+  const navigate = (path: string) => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', path);
+      setCurrentPath(path);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Basic Router matching
+  let pageContent;
+  if (currentPath === '/' || currentPath === '') {
+    pageContent = <Home navigate={navigate} />;
+  } else if (currentPath.startsWith('/tools/')) {
+    const slug = currentPath.split('/tools/')[1]?.replace(/\/$/, ""); // Handle trailing slash
+    pageContent = <ToolPage slug={slug} navigate={navigate} />;
+  } else {
+    pageContent = <Home navigate={navigate} />; // 404 fallback
+  }
 
   return (
     <main className="min-h-screen bg-[#fcfcfc] text-[#1a1a1a] flex flex-col font-sans">
@@ -31,11 +71,14 @@ export default function App() {
       <header className="border-b border-gray-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-40 shrink-0">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-blue-600 rounded-lg shrink-0 shadow-sm flex items-center justify-center">
+            <div 
+              className="w-7 h-7 bg-blue-600 rounded-lg shrink-0 shadow-sm flex items-center justify-center cursor-pointer"
+              onClick={() => navigate('/')}
+            >
               <span className="text-xs font-black text-white font-mono">O</span>
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                 <h1 className="text-lg sm:text-xl font-black tracking-tight text-[#1a1a1a] m-0 leading-none">
                   OptimaCore: AEO Score Calculator
                 </h1>
@@ -63,12 +106,9 @@ export default function App() {
         </div>
       </header>
 
-      {/* REACT ROUTER OUTLET */}
+      {/* VANILLA PAGE ROUTER OUTLET */}
       <div className="flex-1 flex flex-col">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/tools/:slug" element={<ToolPage />} />
-        </Routes>
+        {pageContent}
       </div>
 
       {/* SYSTEM ARCHITECTURE DOCUMENTATION (GEO CO-PILOT INFOGRAPHIC) */}
