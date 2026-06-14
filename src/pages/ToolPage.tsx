@@ -13,19 +13,46 @@ const CATEGORY_ICONS: Record<string, any> = {
 };
 
 export default function ToolPage({ slug, navigate }: { slug: string, navigate: (path: string) => void }) {
-  const activeUtility = useMemo(() => {
+  const activeEntry = useMemo(() => {
     return SLUG_DICTIONARY[slug];
   }, [slug]);
 
   useEffect(() => {
-    if (!activeUtility) {
+    if (!activeEntry) {
       navigate('/');
+      return;
     }
-  }, [activeUtility, navigate]);
+    
+    if (typeof document !== 'undefined') {
+      const { title, description, ogTitle } = activeEntry.meta;
 
-  if (!activeUtility) {
+      // 1. Update Browser Title:
+      document.title = title;
+
+      // 2. Update Meta Description:
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute("content", description);
+      }
+
+      // 3. Update OpenGraph Tags dynamically:
+      let ogTitleTag = document.querySelector('meta[property="og:title"]');
+      if (ogTitleTag) {
+        ogTitleTag.setAttribute("content", ogTitle);
+      }
+
+      let ogUrlTag = document.querySelector('meta[property="og:url"]');
+      if (ogUrlTag) {
+        ogUrlTag.setAttribute("content", window.location.href);
+      }
+    }
+  }, [activeEntry, navigate]);
+
+  if (!activeEntry) {
     return null;
   }
+
+  const activeUtility = activeEntry.utility;
 
   const colors = CATEGORY_COLORS[activeUtility.category];
   const IconComponent = CATEGORY_ICONS[activeUtility.category] || Sliders;

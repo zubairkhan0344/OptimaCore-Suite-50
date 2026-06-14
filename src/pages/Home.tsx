@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { UTILITIES, CATEGORY_COLORS, CATEGORY_LABELS } from '../data';
 import { UtilityCategory } from '../types';
 import { 
@@ -38,6 +38,27 @@ const CATEGORY_TABS: { value: UtilityCategory | 'all'; label: string; icon: any 
 ];
 
 export default function Home({ navigate }: { navigate: (path: string) => void }) {
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = "OptimaCore: AEO Score Calculator | Answer Engine Optimization & GEO Audit Tool";
+      
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute("content", "OptimaCore is the ultimate AEO score calculator. Perform structural Answer Engine Optimization, GEO audits, and leverage 50 specialized calculators for generative search discovery.");
+      }
+
+      let ogTitleTag = document.querySelector('meta[property="og:title"]');
+      if (ogTitleTag) {
+        ogTitleTag.setAttribute("content", "OptimaCore: AEO Score Calculator | Answer Engine Optimization");
+      }
+
+      let ogUrlTag = document.querySelector('meta[property="og:url"]');
+      if (ogUrlTag) {
+        ogUrlTag.setAttribute("content", "https://optimacore.systems/");
+      }
+    }
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<UtilityCategory | 'all'>('all');
 
